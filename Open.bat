@@ -2,26 +2,34 @@
 REM Set color to purple
 color 0D
 
-REM Display ASCII art
-set "script_dir=%~dp0"
-set "ascii_art_path=%script_dir%LocalFiles\HackBlox_Art.txt"  REM Adjusted path to LocalFiles folder
+REM Function to check for LocalFiles folder and HackBlox_Art.txt in parent directories
+:CheckFiles
+set "current_dir=%~dp0"
+set "local_files_path=%current_dir%LocalFiles"
+set "art_file=%local_files_path%\HackBlox_Art.txt"
 
-if exist "%ascii_art_path%" (
-    type "%ascii_art_path%"
+REM Check if LocalFiles folder exists in the current directory
+if exist "%local_files_path%" (
+    REM Display ASCII art
+    if exist "%art_file%" (
+        type "%art_file%"
+    ) else (
+        echo ASCII art file not found: "%art_file%"
+    )
 ) else (
-    echo ASCII art file not found: "%ascii_art_path%"
+    REM If LocalFiles folder is not found, move to parent directory and check again
+    cd ..
+    if not "%current_dir%"=="%cd%" (
+        REM Recursive call to CheckFiles function
+        call :CheckFiles
+    ) else (
+        REM Display error message if LocalFiles folder is not found in any parent directory
+        echo LocalFiles folder not found in any parent directory.
+        pause
+        exit /b 1
+    )
 )
 
-REM Set path to the README.md file
-set "readme_path=%~dp0LocalFiles\meemstr.github.io-main\README.md"
-
-REM Check if the README.md file exists
-if exist "%readme_path%" (
-    REM Open the README.md file using the default text editor
-    start "" "%readme_path%"
-) else (
-    echo README.md file not found: "%readme_path%"
-)
-
-REM Pause to keep the window open (optional)
+REM Optionally, you can add more commands here to execute after displaying ASCII art
 pause
+exit /b 0
